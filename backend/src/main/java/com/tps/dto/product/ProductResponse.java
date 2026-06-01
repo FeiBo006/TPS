@@ -16,6 +16,8 @@ public class ProductResponse {
     private Long userId;
     private String sellerNickname;
     private String sellerAvatar;
+    private Integer sellerCreditScore;
+    private long sellerReviewCount;
     private String title;
     private String description;
     private BigDecimal price;

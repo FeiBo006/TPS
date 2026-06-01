@@ -20,4 +20,5 @@ public class UserProfileResponse {
     private String role;
     private String status;
     private int productCount;
+    private long reviewCount;
 }

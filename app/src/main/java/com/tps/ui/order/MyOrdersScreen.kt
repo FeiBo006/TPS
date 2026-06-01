@@ -35,6 +35,7 @@ val ORDER_STATUS_LABEL = mapOf(
 fun MyOrdersScreen(initialRole: String? = null, viewModel: OrderViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsState()
     val tabs = listOf("buyer" to "我买的", "seller" to "我卖的")
+    val snackbarHostState = remember { SnackbarHostState() }
     
     LaunchedEffect(initialRole) {
         if (initialRole != null) {
@@ -46,11 +47,22 @@ fun MyOrdersScreen(initialRole: String? = null, viewModel: OrderViewModel = hilt
 
     uiState.error?.let { err ->
         LaunchedEffect(err) {
+            snackbarHostState.showSnackbar(err)
             viewModel.clearError()
         }
     }
+    uiState.successMessage?.let { message ->
+        LaunchedEffect(message) {
+            snackbarHostState.showSnackbar(message)
+            viewModel.clearSuccess()
+        }
+    }
 
-    Scaffold(containerColor = Color.Transparent, topBar = { TopAppBar(title = { Text("我的订单", fontWeight = FontWeight.Bold) }) }) { padding ->
+    Scaffold(
+        containerColor = Color.Transparent,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        topBar = { TopAppBar(title = { Text("我的订单", fontWeight = FontWeight.Bold) }) }
+    ) { padding ->
         MarketBackground {
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
             MarketHeroCard(
@@ -85,7 +97,8 @@ fun MyOrdersScreen(initialRole: String? = null, viewModel: OrderViewModel = hilt
                             onPay = { viewModel.pay(order.id) },
                             onShip = { viewModel.ship(order.id) },
                             onConfirm = { viewModel.confirmReceived(order.id) },
-                            onCancel = { viewModel.cancel(order.id) }
+                            onCancel = { viewModel.cancel(order.id) },
+                            onReview = { score, content -> viewModel.review(order.id, score, content) }
                         )
                     }
                 }
@@ -102,9 +115,13 @@ fun OrderCard(
     onPay: () -> Unit,
     onShip: () -> Unit,
     onConfirm: () -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    onReview: (Int, String) -> Unit
 ) {
     val statusLabel = ORDER_STATUS_LABEL[order.status] ?: order.status
+    var showReviewForm by remember { mutableStateOf(false) }
+    var reviewScore by remember { mutableStateOf(5) }
+    var reviewContent by remember { mutableStateOf("") }
     val statusColor = when (order.status) {
         "PENDING" -> MaterialTheme.colorScheme.error
         "PAID", "SHIPPED" -> MaterialTheme.colorScheme.primary
@@ -140,6 +157,45 @@ fun OrderCard(
                 }
                 if (!isBuyer && order.status == "PAID") {
                     Button(onClick = onShip, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = MarketOrange)) { Text("确认发货") }
+                }
+                if (order.status == "DONE") {
+                    OutlinedButton(onClick = { showReviewForm = !showReviewForm }, modifier = Modifier.weight(1f)) {
+                        Text(if (showReviewForm) "收起评价" else "评价交易")
+                    }
+                }
+            }
+
+            if (showReviewForm) {
+                HorizontalDivider()
+                Text("交易评价", fontWeight = FontWeight.Bold)
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text("评分")
+                    (1..5).forEach { score ->
+                        FilterChip(
+                            selected = reviewScore == score,
+                            onClick = { reviewScore = score },
+                            label = { Text("$score") }
+                        )
+                    }
+                }
+                OutlinedTextField(
+                    value = reviewContent,
+                    onValueChange = { reviewContent = it },
+                    label = { Text("评价内容（可选）") },
+                    minLines = 2,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Button(
+                    onClick = {
+                        onReview(reviewScore, reviewContent)
+                        showReviewForm = false
+                        reviewContent = ""
+                        reviewScore = 5
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = MarketOrange)
+                ) {
+                    Text("提交评价")
                 }
             }
         }

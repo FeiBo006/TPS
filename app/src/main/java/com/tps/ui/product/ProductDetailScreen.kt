@@ -399,7 +399,11 @@ fun ProductDetailScreen(
                             }
                             Column(modifier = Modifier.padding(start = 12.dp).weight(1f)) {
                                 Text(product.sellerNickname, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                Text("已实名认证 · 校园交易更安心", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+                                Text(
+                                    "信用分 ${product.sellerCreditScore ?: 100} · ${product.sellerReviewCount} 条评价",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    fontSize = 12.sp
+                                )
                             }
                             Icon(Icons.Default.Verified, null, tint = Color(0xFF1F8A70))
                         }

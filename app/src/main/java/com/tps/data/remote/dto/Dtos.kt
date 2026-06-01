@@ -58,7 +58,8 @@ data class UserProfile(
     val shippingAddress: String?,
     val role: String,
     val status: String,
-    val productCount: Int
+    val productCount: Int,
+    val reviewCount: Long = 0
 )
 
 data class UpdateProfileRequest(
@@ -80,6 +81,8 @@ data class ProductDto(
     val userId: Long,
     val sellerNickname: String,
     val sellerAvatar: String?,
+    val sellerCreditScore: Int? = null,
+    val sellerReviewCount: Long = 0,
     val title: String,
     val description: String?,
     val price: Double,
@@ -122,6 +125,16 @@ data class OrderDto(
     val status: String,
     val remark: String? = null,
     val trackingNumber: String? = null,
+    val createdAt: String?
+)
+
+data class ReviewDto(
+    val id: Long,
+    val orderId: Long,
+    val reviewerId: Long,
+    val revieweeId: Long,
+    val score: Int,
+    val content: String?,
     val createdAt: String?
 )
 

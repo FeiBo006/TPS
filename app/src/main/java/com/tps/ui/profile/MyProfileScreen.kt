@@ -109,6 +109,11 @@ fun MyProfileScreen(
                         }
                         Text(uiState.profile?.nickname ?: "", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.ExtraBold)
                         StatusPill("信用分 ${uiState.profile?.creditScore ?: 0}", MarketOrange)
+                        Text(
+                            "收到评价 ${uiState.profile?.reviewCount ?: 0} 条",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                         uiState.profile?.studentId?.let { if (it.isNotBlank()) Text("学号：$it", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
                         uiState.profile?.bio?.let { if (it.isNotBlank()) Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
                         uiState.profile?.location?.let { if (it.isNotBlank()) Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
@@ -131,8 +136,8 @@ fun MyProfileScreen(
                             Text("我买到的", fontSize = 12.sp, color = Color.Gray, modifier = Modifier.padding(top = 4.dp))
                         }
                         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable { onNavigateToFavorites() }) {
-                            Text("0", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF241713))
-                            Text("我收藏的", fontSize = 12.sp, color = Color.Gray, modifier = Modifier.padding(top = 4.dp))
+                            Text(uiState.profile?.reviewCount?.toString() ?: "0", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF241713))
+                            Text("评价数", fontSize = 12.sp, color = Color.Gray, modifier = Modifier.padding(top = 4.dp))
                         }
                     }
                 }

@@ -77,6 +77,12 @@ public class OrderService {
         return toResponse(getOwnedOrder(orderId, userId));
     }
 
+    public Page<ReviewResponse> getReviewsForUser(Long userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        return reviewRepository.findByRevieweeIdOrderByCreatedAtDesc(userId, pageable)
+                .map(this::toReviewResponse);
+    }
+
     private Order getOwnedOrder(Long orderId, Long userId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("订单不存在"));

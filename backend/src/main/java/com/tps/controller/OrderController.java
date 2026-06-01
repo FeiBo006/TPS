@@ -41,6 +41,13 @@ public class OrderController {
         return ApiResponse.success(orderService.getOrder(id, userId));
     }
 
+    @GetMapping("/reviews/user/{userId}")
+    public ApiResponse<?> getUserReviews(@PathVariable Long userId,
+                                         @RequestParam(defaultValue = "0") int page,
+                                         @RequestParam(defaultValue = "20") int size) {
+        return ApiResponse.success(PageResponse.from(orderService.getReviewsForUser(userId, page, size)));
+    }
+
     @PutMapping("/{id}/pay")
     public ApiResponse<?> pay(@PathVariable Long id, @AuthenticationPrincipal Long userId) {
         orderService.pay(id, userId);

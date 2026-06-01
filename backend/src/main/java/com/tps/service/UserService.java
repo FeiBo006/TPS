@@ -8,6 +8,7 @@ import com.tps.dto.user.UpdateProfileRequest;
 import com.tps.dto.user.UserProfileResponse;
 import com.tps.entity.User;
 import com.tps.repository.ProductRepository;
+import com.tps.repository.ReviewRepository;
 import com.tps.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final ReviewRepository reviewRepository;
     private final FileService fileService;
 
     public UserProfileResponse getProfile(Long userId) {
@@ -70,6 +72,7 @@ public class UserService {
         r.setRole(user.getRole().name());
         r.setStatus(user.getStatus().name());
         r.setProductCount(productRepository.findByUserId(user.getId()).size());
+        r.setReviewCount(reviewRepository.countByRevieweeId(user.getId()));
         return r;
     }
 }

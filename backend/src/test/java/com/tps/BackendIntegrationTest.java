@@ -149,6 +149,24 @@ class BackendIntegrationTest {
                         .param("content", "good"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.score").value(5));
+
+        Long sellerId = userRepository.findByPhone("13800138002").orElseThrow().getId();
+        mockMvc.perform(get("/api/users/{id}", sellerId).header("Authorization", "Bearer " + buyerToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.creditScore").value(100))
+                .andExpect(jsonPath("$.data.reviewCount").value(1));
+
+        mockMvc.perform(get("/api/products/{id}", productId).header("Authorization", "Bearer " + buyerToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.sellerCreditScore").value(100))
+                .andExpect(jsonPath("$.data.sellerReviewCount").value(1));
+
+        mockMvc.perform(get("/api/orders/reviews/user/{userId}", sellerId).header("Authorization", "Bearer " + buyerToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.content", hasSize(1)))
+                .andExpect(jsonPath("$.data.content[0].revieweeId").value(sellerId))
+                .andExpect(jsonPath("$.data.content[0].score").value(5))
+                .andExpect(jsonPath("$.data.content[0].content").value("good"));
     }
 
     @Test

@@ -117,6 +117,20 @@ interface ApiService {
     @PUT("api/orders/{id}/cancel")
     suspend fun cancelOrder(@Path("id") id: Long): ApiResponse<Unit>
 
+    @POST("api/orders/{id}/review")
+    suspend fun reviewOrder(
+        @Path("id") id: Long,
+        @Query("score") score: Int,
+        @Query("content") content: String? = null
+    ): ApiResponse<ReviewDto>
+
+    @GET("api/orders/reviews/user/{userId}")
+    suspend fun getUserReviews(
+        @Path("userId") userId: Long,
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 20
+    ): ApiResponse<PageResponse<ReviewDto>>
+
     // Messages
     @GET("api/messages/conversations")
     suspend fun getConversations(): ApiResponse<PageResponse<ConversationDto>>

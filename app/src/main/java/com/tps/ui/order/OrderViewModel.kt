@@ -18,7 +18,8 @@ data class OrderUiState(
     val orders: List<OrderDto> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
-    val role: String = "buyer"
+    val role: String = "buyer",
+    val successMessage: String? = null
 )
 
 @HiltViewModel
@@ -91,7 +92,23 @@ class OrderViewModel @Inject constructor(
         }
     }
 
+    fun review(orderId: Long, score: Int, content: String) {
+        viewModelScope.launch {
+            try {
+                apiService.reviewOrder(orderId, score, content.ifBlank { null })
+                _uiState.value = _uiState.value.copy(successMessage = "评价已提交")
+                loadOrders()
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(error = e.message)
+            }
+        }
+    }
+
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
+    }
+
+    fun clearSuccess() {
+        _uiState.value = _uiState.value.copy(successMessage = null)
     }
 }

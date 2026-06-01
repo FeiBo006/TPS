@@ -37,6 +37,7 @@ public class ProductService {
     private final FileService fileService;
     private final ReportRepository reportRepository;
     private final NotificationRepository notificationRepository;
+    private final ReviewRepository reviewRepository;
 
     @Transactional
     public ProductResponse create(Long userId, ProductRequest req) {
@@ -214,6 +215,8 @@ public class ProductService {
         userRepository.findById(p.getUserId()).ifPresent(u -> {
             r.setSellerNickname(u.getNickname());
             r.setSellerAvatar(fileService.toAbsoluteUrl(u.getAvatarUrl()));
+            r.setSellerCreditScore(u.getCreditScore());
+            r.setSellerReviewCount(reviewRepository.countByRevieweeId(u.getId()));
         });
         r.setTitle(p.getTitle());
         r.setDescription(p.getDescription());
